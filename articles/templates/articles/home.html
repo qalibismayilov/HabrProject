@@ -1,0 +1,184 @@
+
+{% extends "base.html" %}
+
+{% block title %}Ana səhifə | HabrProject{% endblock %}
+
+{% block content %}
+
+<div class="p-4 p-md-5 mb-4 rounded-4 text-white"
+     style="background: linear-gradient(120deg, #172554, #2563eb);">
+    <h1 class="display-5 fw-bold">Biliklərini paylaş!</h1>
+    <p class="lead">
+        Proqramlaşdırma, süni intellekt və texnologiya haqqında məqalələr oxu,
+        öz biliklərini başqaları ilə paylaş.
+    </p>
+
+    {% if user.is_authenticated %}
+        <a href="{% url 'article_create' %}" class="btn btn-light btn-lg">
+            Məqalə yarat
+        </a>
+    {% else %}
+        <a href="{% url 'register' %}" class="btn btn-light btn-lg">
+            İndi qeydiyyatdan keç
+        </a>
+    {% endif %}
+</div>
+
+<div class="row g-4">
+
+    <div class="col-lg-8">
+
+        <div class="content-card mb-4">
+            <h2 class="h4 mb-3">Məqalələri axtar</h2>
+
+            <form method="get" action="{% url 'home' %}">
+                <div class="input-group">
+                    <input
+                        type="text"
+                        name="q"
+                        class="form-control"
+                        placeholder="Başlıq, mətn və ya müəllif adı..."
+                        value="{{ query }}"
+                    >
+                    <button class="btn btn-primary" type="submit">
+                        Axtar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h3 mb-0">Son məqalələr</h2>
+            <a href="{% url 'popular' %}" class="text-decoration-none">
+                Populyar məqalələr →
+            </a>
+        </div>
+
+        {% for article in articles %}
+            <div class="content-card mb-4">
+
+                {% if article.image %}
+                    <a href="{% url 'article_detail' article.pk %}">
+                        <img
+                            src="{{ article.image.url }}"
+                            alt="{{ article.title }}"
+                            class="article-image mb-3"
+                        >
+                    </a>
+                {% endif %}
+
+                <div class="mb-2">
+                    <a
+                        href="{% url 'category_detail' article.category.pk %}"
+                        class="badge text-bg-primary text-decoration-none"
+                    >
+                        {{ article.category.name }}
+                    </a>
+                </div>
+
+                <h2 class="h4">
+                    <a
+                        href="{% url 'article_detail' article.pk %}"
+                        class="text-dark text-decoration-none"
+                    >
+                        {{ article.title }}
+                    </a>
+                </h2>
+
+                <p class="text-secondary">
+                    {{ article.content|truncatewords:35 }}
+                </p>
+
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div class="small text-secondary">
+                        Müəllif:
+                        <strong>{{ article.author.username }}</strong>
+                        <span class="mx-1">·</span>
+                        {{ article.created_at|date:"d.m.Y H:i" }}
+                    </div>
+
+                    <div class="small">
+                        ⭐ {{ article.average_rating|default:"0" }}/5
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <a
+                        href="{% url 'article_detail' article.pk %}"
+                        class="btn btn-outline-primary btn-sm"
+                    >
+                        Məqaləni oxu
+                    </a>
+                </div>
+
+            </div>
+
+        {% empty %}
+            <div class="content-card text-center py-5">
+                <h3 class="h5">Hələ məqalə yoxdur</h3>
+
+                {% if query %}
+                    <p class="text-secondary">
+                        "{{ query }}" axtarışına uyğun məqalə tapılmadı.
+                    </p>
+                    <a href="{% url 'home' %}" class="btn btn-outline-primary">
+                        Bütün məqalələr
+                    </a>
+                {% else %}
+                    <p class="text-secondary">
+                        İlk məqaləni yarat və biliklərini paylaş!
+                    </p>
+
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'article_create' %}" class="btn btn-primary">
+                            Məqalə yarat
+                        </a>
+                    {% else %}
+                        <a href="{% url 'register' %}" class="btn btn-primary">
+                            Qeydiyyatdan keç
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% endfor %}
+
+    </div>
+
+    <div class="col-lg-4">
+
+        <div class="content-card mb-4">
+            <h2 class="h5 mb-3">Kateqoriyalar</h2>
+
+            {% for category in categories %}
+                <a
+                    href="{% url 'category_detail' category.pk %}"
+                    class="d-flex justify-content-between align-items-center py-2 border-bottom text-decoration-none text-dark"
+                >
+                    <span>{{ category.name }}</span>
+                    <span class="text-secondary">→</span>
+                </a>
+            {% empty %}
+                <p class="text-secondary mb-0">
+                    Kateqoriyalar hələ yaradılmayıb.
+                </p>
+            {% endfor %}
+
+            <a href="{% url 'categories' %}" class="btn btn-outline-primary btn-sm mt-3">
+                Bütün kateqoriyalar
+            </a>
+        </div>
+
+        <div class="content-card">
+            <h2 class="h5">HabrProject haqqında</h2>
+            <p class="text-secondary mb-0">
+                Burada istifadəçilər texnologiya haqqında məqalələr yaza,
+                digər məqalələri oxuya, qiymətləndirə və seçilmişlərinə əlavə
+                edə bilərlər.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

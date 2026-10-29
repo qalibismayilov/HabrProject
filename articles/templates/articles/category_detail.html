@@ -1,0 +1,91 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} | HabrProject{% endblock %}
+
+{% block content %}
+
+<div class="content-card mb-4">
+    <span class="fs-1">📂</span>
+
+    <h1 class="h2 mt-2">{{ category.name }}</h1>
+
+    <p class="text-secondary mb-0">
+        Bu kateqoriyaya aid yayımlanmış məqalələr.
+    </p>
+</div>
+
+<h2 class="h4 mb-3">Məqalələr</h2>
+
+{% for article in articles %}
+    <div class="content-card mb-3">
+
+        {% if article.image %}
+            <a href="{% url 'article_detail' article.pk %}">
+                <img
+                    src="{{ article.image.url }}"
+                    alt="{{ article.title }}"
+                    class="article-image mb-3"
+                    style="max-height: 280px;"
+                >
+            </a>
+        {% endif %}
+
+        <h3 class="h5">
+            <a
+                href="{% url 'article_detail' article.pk %}"
+                class="text-dark text-decoration-none"
+            >
+                {{ article.title }}
+            </a>
+        </h3>
+
+        <p class="text-secondary">
+            {{ article.content|truncatewords:35 }}
+        </p>
+
+        <div class="d-flex justify-content-between flex-wrap gap-2">
+            <span class="small text-secondary">
+                Müəllif: <strong>{{ article.author.username }}</strong>
+            </span>
+
+            <span class="small text-secondary">
+                {{ article.created_at|date:"d.m.Y" }}
+            </span>
+        </div>
+
+        <a
+            href="{% url 'article_detail' article.pk %}"
+            class="btn btn-outline-primary btn-sm mt-3"
+        >
+            Məqaləni oxu →
+        </a>
+
+    </div>
+{% empty %}
+    <div class="content-card text-center py-5">
+        <h3 class="h5">Bu kateqoriyada hələ məqalə yoxdur</h3>
+
+        <p class="text-secondary">
+            Bu mövzuda ilk məqaləni sən yarada bilərsən.
+        </p>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'article_create' %}" class="btn btn-primary">
+                Məqalə yarat
+            </a>
+        {% else %}
+            <a href="{% url 'register' %}" class="btn btn-primary">
+                Qeydiyyatdan keç
+            </a>
+        {% endif %}
+    </div>
+{% endfor %}
+
+<div class="mt-4">
+    <a href="{% url 'categories' %}" class="btn btn-outline-secondary">
+        ← Kateqoriyalara qayıt
+    </a>
+</div>
+
+{% endblock %}

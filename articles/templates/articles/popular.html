@@ -1,0 +1,83 @@
+
+{% extends "base.html" %}
+
+{% block title %}Populyar məqalələr | HabrProject{% endblock %}
+
+{% block content %}
+
+<div class="mb-4">
+    <h1 class="h2">🔥 Populyar məqalələr</h1>
+    <p class="text-secondary">
+        İstifadəçilərin bəyəndiyi və yüksək qiymətləndirdiyi məqalələr.
+    </p>
+</div>
+
+{% for article in articles %}
+    <div class="content-card mb-3">
+
+        <div class="row g-3">
+
+            {% if article.image %}
+                <div class="col-md-4">
+                    <a href="{% url 'article_detail' article.pk %}">
+                        <img
+                            src="{{ article.image.url }}"
+                            alt="{{ article.title }}"
+                            class="article-image"
+                            style="max-height: 220px;"
+                        >
+                    </a>
+                </div>
+            {% endif %}
+
+            <div class="{% if article.image %}col-md-8{% else %}col-12{% endif %}">
+
+                <span class="badge text-bg-primary mb-2">
+                    {{ article.category.name }}
+                </span>
+
+                <h2 class="h4">
+                    <a
+                        href="{% url 'article_detail' article.pk %}"
+                        class="text-dark text-decoration-none"
+                    >
+                        {{ article.title }}
+                    </a>
+                </h2>
+
+                <p class="text-secondary">
+                    {{ article.content|truncatewords:30 }}
+                </p>
+
+                <div class="small text-secondary mb-3">
+                    Müəllif: <strong>{{ article.author.username }}</strong>
+                    <span class="mx-2">|</span>
+                    👍 {{ article.like_count|default:0 }}
+                    <span class="mx-2">|</span>
+                    ⭐ {{ article.rating_average|default:0|floatformat:1 }}/5
+                </div>
+
+                <a
+                    href="{% url 'article_detail' article.pk %}"
+                    class="btn btn-outline-primary btn-sm"
+                >
+                    Məqaləni oxu →
+                </a>
+
+            </div>
+        </div>
+
+    </div>
+{% empty %}
+    <div class="content-card text-center py-5">
+        <h2 class="h5">Hələ populyar məqalə yoxdur</h2>
+        <p class="text-secondary">
+            Məqalələr bəyənildikcə onlar burada görünəcək.
+        </p>
+        <a href="{% url 'home' %}" class="btn btn-primary">
+            Ana səhifəyə qayıt
+        </a>
+    </div>
+{% endfor %}
+
+{% endblock %}

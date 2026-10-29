@@ -1,0 +1,63 @@
+
+{% extends "base.html" %}
+
+{% block title %}Kateqoriyalar | HabrProject{% endblock %}
+
+{% block content %}
+
+<div class="mb-4">
+    <h1 class="h2">📚 Məqalə kateqoriyaları</h1>
+    <p class="text-secondary">
+        Maraqlı mövzunu seç və həmin kateqoriyadakı məqalələri oxu.
+    </p>
+</div>
+
+<div class="row g-4">
+
+    {% for category in categories %}
+        <div class="col-md-6 col-lg-4">
+
+            <div class="content-card h-100">
+
+                <div class="mb-3">
+                    <span class="fs-2">📂</span>
+                </div>
+
+                <h2 class="h5">{{ category.name }}</h2>
+
+                <p class="text-secondary">
+                    Bu kateqoriyada
+                    <strong>{{ category.article_count }}</strong>
+                    yayımlanmış məqalə var.
+                </p>
+
+                <a
+                    href="{% url 'category_detail' category.pk %}"
+                    class="btn btn-outline-primary"
+                >
+                    Məqalələrə bax →
+                </a>
+
+            </div>
+
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="content-card text-center py-5">
+                <h2 class="h5">Kateqoriya tapılmadı</h2>
+                <p class="text-secondary">
+                    Kateqoriyalar admin panelindən əlavə edilə bilər.
+                </p>
+            </div>
+        </div>
+    {% endfor %}
+
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+        ← Ana səhifəyə qayıt
+    </a>
+</div>
+
+{% endblock %}

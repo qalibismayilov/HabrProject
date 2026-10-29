@@ -1,0 +1,181 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} | HabrProject{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+
+        <div class="content-card mb-4">
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <a
+                    href="{% url 'category_detail' article.category.pk %}"
+                    class="badge text-bg-primary text-decoration-none"
+                >
+                    {{ article.category.name }}
+                </a>
+
+                {% if article.status != "published" %}
+                    <span class="badge text-bg-warning">
+                        {{ article.get_status_display }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <h1 class="mb-3">{{ article.title }}</h1>
+
+            <div class="text-secondary small mb-4">
+                Müəllif: <strong>{{ article.author.username }}</strong>
+                <span class="mx-2">|</span>
+                Yaradılıb: {{ article.created_at|date:"d.m.Y H:i" }}
+
+                {% if article.updated_at != article.created_at %}
+                    <span class="mx-2">|</span>
+                    Yenilənib: {{ article.updated_at|date:"d.m.Y H:i" }}
+                {% endif %}
+            </div>
+
+            {% if article.image %}
+                <img
+                    src="{{ article.image.url }}"
+                    alt="{{ article.title }}"
+                    class="article-image mb-4"
+                >
+            {% endif %}
+
+            <div class="article-content" style="line-height: 1.9; overflow-wrap: anywhere;">
+                {{ article.content|linebreaks }}
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <span class="me-2">
+                    <strong>Reytinq:</strong>
+                    ⭐ {{ article.average_rating }}/5
+                </span>
+
+                <span class="text-secondary">
+                    ({{ article.ratings.count }} qiymətləndirmə)
+                </span>
+            </div>
+
+            {% if user.is_authenticated and article.status == "published" %}
+                <hr>
+
+                <h2 class="h5">Bu məqaləni qiymətləndir</h2>
+
+                <form
+                    method="post"
+                    action="{% url 'rate_article' article.pk %}"
+                    class="d-flex flex-wrap align-items-center gap-2 mb-4"
+                >
+                    {% csrf_token %}
+
+                    <select name="value" class="form-select" style="width: 150px;" required>
+                        <option value="">Qiymət seç</option>
+
+                        {% for number in "12345" %}
+                            <option
+                                value="{{ number }}"
+                                {% if user_rating|stringformat:"s" == number %}selected{% endif %}
+                            >
+                                {{ number }} / 5 ⭐
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <button type="submit" class="btn btn-primary">
+                        Qiymətləndir
+                    </button>
+                </form>
+
+                <h2 class="h5">Səs ver</h2>
+
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <form method="post" action="{% url 'vote_article' article.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="vote_type" value="like">
+
+                        <button
+                            type="submit"
+                            class="btn {% if user_vote == 'like' %}btn-success{% else %}btn-outline-success{% endif %}"
+                        >
+                            👍 Bəyən ({{ likes }})
+                        </button>
+                    </form>
+
+                    <form method="post" action="{% url 'vote_article' article.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="vote_type" value="dislike">
+
+                        <button
+                            type="submit"
+                            class="btn {% if user_vote == 'dislike' %}btn-danger{% else %}btn-outline-danger{% endif %}"
+                        >
+                            👎 Bəyənmə ({{ dislikes }})
+                        </button>
+                    </form>
+
+                    <form method="post" action="{% url 'toggle_favorite' article.pk %}">
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="btn {% if is_favorite %}btn-warning{% else %}btn-outline-warning{% endif %}"
+                        >
+                            {% if is_favorite %}
+                                ★ Seçilmişlərdən çıxar
+                            {% else %}
+                                ☆ Seçilmişlərə əlavə et
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+
+            {% elif not user.is_authenticated and article.status == "published" %}
+                <div class="alert alert-info mt-4">
+                    Məqaləni bəyənmək, qiymətləndirmək və seçilmişlərə əlavə etmək
+                    üçün <a href="{% url 'login' %}">sistemə daxil ol</a>.
+                </div>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                {% if article.author == user or user.is_staff or user.role == "super_admin" or user.role == "admin" %}
+                    <hr>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <a
+                            href="{% url 'article_edit' article.pk %}"
+                            class="btn btn-outline-primary"
+                        >
+                            ✏️ Redaktə et
+                        </a>
+
+                        <form
+                            method="post"
+                            action="{% url 'article_delete' article.pk %}"
+                            onsubmit="return confirm('Bu məqaləni silmək istədiyinə əminsən?');"
+                        >
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger">
+                                🗑️ Məqaləni sil
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            {% endif %}
+
+        </div>
+
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+            ← Ana səhifəyə qayıt
+        </a>
+
+    </div>
+</div>
+
+{% endblock %}

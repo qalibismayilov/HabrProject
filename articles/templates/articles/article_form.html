@@ -1,0 +1,84 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | HabrProject{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+
+        <div class="content-card">
+
+            <h1 class="h3 mb-2">{{ page_title }}</h1>
+
+            <p class="text-secondary mb-4">
+                Məqalənin məlumatlarını doldur və formanı göndər.
+            </p>
+
+            {% if article and article.status == "published" and not user.is_staff and user.role != "admin" and user.role != "super_admin" %}
+                <div class="alert alert-info">
+                    Dəyişikliklər admin tərəfindən təsdiqlənənə qədər
+                    yayımlanmış məqalədəki hazırkı mətn dəyişməyəcək.
+                </div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="mb-3">
+
+                        <label for="{{ field.id_for_label }}" class="form-label">
+                            {{ field.label }}
+                        </label>
+
+                        {{ field }}
+
+                        {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                {% endfor %}
+
+                <div class="d-flex flex-wrap gap-2 mt-4">
+
+                    <button type="submit" class="btn btn-primary">
+                        {{ button_text|default:"Yadda saxla" }}
+                    </button>
+
+                    {% if article %}
+                        <a
+                            href="{% url 'article_detail' article.pk %}"
+                            class="btn btn-outline-secondary"
+                        >
+                            Ləğv et
+                        </a>
+                    {% else %}
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                            Ləğv et
+                        </a>
+                    {% endif %}
+
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,71 @@
+
+{% extends "base.html" %}
+
+{% block title %}Giriş | HabrProject{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-5">
+
+        <div class="content-card">
+
+            <h1 class="h3 text-center mb-2">Xoş gəlmisən!</h1>
+
+            <p class="text-secondary text-center mb-4">
+                HabrProject hesabına daxil ol.
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="username" class="form-label">
+                        İstifadəçi adı
+                    </label>
+
+                    <input
+                        type="text"
+                        name="username"
+                        id="username"
+                        class="form-control"
+                        placeholder="İstifadəçi adını daxil et"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">
+                        Şifrə
+                    </label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        class="form-control"
+                        placeholder="Şifrəni daxil et"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    Daxil ol
+                </button>
+            </form>
+
+            <hr>
+
+            <p class="text-center mb-0">
+                Hesabın yoxdur?
+                <a href="{% url 'register' %}">Qeydiyyatdan keç</a>
+            </p>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

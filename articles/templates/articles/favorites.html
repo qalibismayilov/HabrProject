@@ -1,0 +1,106 @@
+
+{% extends "base.html" %}
+
+{% block title %}Seçilmişlərim | HabrProject{% endblock %}
+
+{% block content %}
+
+<div class="mb-4">
+    <h1 class="h2">⭐ Seçilmiş məqalələrim</h1>
+    <p class="text-secondary">
+        Sonra oxumaq üçün saxladığın məqalələr burada görünür.
+    </p>
+</div>
+
+{% for favorite in favorites %}
+    <div class="content-card mb-3">
+
+        <div class="row g-3">
+
+            {% if favorite.article.image %}
+                <div class="col-md-4">
+                    <a href="{% url 'article_detail' favorite.article.pk %}">
+                        <img
+                            src="{{ favorite.article.image.url }}"
+                            alt="{{ favorite.article.title }}"
+                            class="article-image"
+                            style="max-height: 220px;"
+                        >
+                    </a>
+                </div>
+            {% endif %}
+
+            <div class="{% if favorite.article.image %}col-md-8{% else %}col-12{% endif %}">
+
+                <span class="badge text-bg-primary mb-2">
+                    {{ favorite.article.category.name }}
+                </span>
+
+                <h2 class="h4">
+                    <a
+                        href="{% url 'article_detail' favorite.article.pk %}"
+                        class="text-dark text-decoration-none"
+                    >
+                        {{ favorite.article.title }}
+                    </a>
+                </h2>
+
+                <p class="text-secondary">
+                    {{ favorite.article.content|truncatewords:30 }}
+                </p>
+
+                <div class="small text-secondary mb-3">
+                    Müəllif: <strong>{{ favorite.article.author.username }}</strong>
+                    <span class="mx-2">|</span>
+                    Əlavə edilib: {{ favorite.created_at|date:"d.m.Y" }}
+                </div>
+
+                <div class="d-flex flex-wrap gap-2">
+
+                    <a
+                        href="{% url 'article_detail' favorite.article.pk %}"
+                        class="btn btn-outline-primary btn-sm"
+                    >
+                        Məqaləni oxu →
+                    </a>
+
+                    <form
+                        method="post"
+                        action="{% url 'toggle_favorite' favorite.article.pk %}"
+                    >
+                        {% csrf_token %}
+
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            ★ Seçilmişlərdən çıxar
+                        </button>
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+{% empty %}
+    <div class="content-card text-center py-5">
+        <div class="display-4 mb-3">☆</div>
+
+        <h2 class="h5">Seçilmiş məqalən yoxdur</h2>
+
+        <p class="text-secondary">
+            Bəyəndiyin məqaləni aç və “Seçilmişlərə əlavə et” düyməsinə bas.
+        </p>
+
+        <a href="{% url 'home' %}" class="btn btn-primary">
+            Məqalələrə bax
+        </a>
+    </div>
+{% endfor %}
+
+<div class="mt-4">
+    <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+        ← Ana səhifəyə qayıt
+    </a>
+</div>
+
+{% endblock %}
